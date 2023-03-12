@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using ReadyPlayerMe.Core;
 using ReadyPlayerMe.Loader;
 using UnityEngine;
@@ -84,7 +85,7 @@ namespace ReadyPlayerMe.AvatarLoader
         /// Runs through the process of loading the avatar and creating a game object via the <c>OperationExecutor</c>.
         /// </summary>
         /// <param name="url">The URL to the avatars .glb file.</param>
-        public async void Load(string url)
+        public async Task<CompletionEventArgs> Load(string url)
         {
             var context = new AvatarContext();
             context.Url = url;
@@ -112,19 +113,21 @@ namespace ReadyPlayerMe.AvatarLoader
             catch (CustomException exception)
             {
                 Failed(executor.IsCancelled ? FailureType.OperationCancelled : exception.FailureType, exception.Message);
-                return;
+                return null;
             }
 
-            var avatar = (GameObject) context.Data;
+            var avatar = (GameObject)context.Data;
             avatar.SetActive(true);
-            OnCompleted?.Invoke(this, new CompletionEventArgs
+            var completion = new CompletionEventArgs
             {
                 Avatar = avatar,
                 Url = context.Url,
                 Metadata = context.Metadata
-            });
+            };
+            OnCompleted?.Invoke(this, completion);
 
             SDKLogger.Log(TAG, $"Avatar loaded in {Time.timeSinceLevelLoad - startTime:F2} seconds.");
+            return completion;
         }
 
         /// <summary>
