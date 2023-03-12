@@ -84,7 +84,7 @@ namespace ReadyPlayerMe.AvatarLoader
         /// Runs through the process of loading the avatar and creating a game object via the <c>OperationExecutor</c>.
         /// </summary>
         /// <param name="url">The URL to the avatars .glb file.</param>
-        private async void Load(string url)
+        public async void Load(string url)
         {
             var context = new AvatarContext();
             context.Url = url;
